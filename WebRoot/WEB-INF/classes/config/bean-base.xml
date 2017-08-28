@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 配置命名空间 -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+	    http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd">
+	<!--配置数据源,把Hibernate的数据库连接池交个Spring来管理 -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+		<property name="jdbcUrl" value="jdbc:mysql:///ShoppingForSSH"></property>
+		<property name="user" value="root"></property>
+		<property name="password" value="123456"></property>
+	</bean>
+	<!-- 配置一个jdbctemplate -->
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	<context:component-scan base-package="com.qf"></context:component-scan>
+	<!--配置Sessionfactory的工厂类 -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<!--开始Hibernate的配置 -->
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+			</props>
+		</property>
+		<!--配置对象的映射的文件 -->
+		<property name="mappingDirectoryLocations">
+			<list>
+				<value>classpath:com/qf/shopping/user/entity</value>
+			</list>
+		</property>
+	</bean>
+	<!--配置事务 -->
+	<bean id="txManager"
+		class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	<!--配置事务的增强 -->
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<!--配置所有的事物都具有读写事物的能力 -->
+			<tx:method name="*" read-only="false" />
+		</tx:attributes>
+	</tx:advice>
+	<!--配置aop来应用这个事务的增强 -->
+	<!-- <context:component-scan base-package="com.qf.shopping.annotation"></context:component-scan> 
+		<aop:aspectj-autoproxy></aop:aspectj-autoproxy> -->
+	<aop:config>
+		<!--配置的是切入点的表达式 -->
+		<aop:pointcut expression="execution(* com.qf.shopping.user.dao.UserDao.*.*(..))"
+			id="pt" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="pt" />
+		<!-- 下面配置切面 -->
+		<aop:aspect ref="aop">
+			<aop:before method="setSession" pointcut-ref="pt" />
+			<aop:after method="transtion" pointcut-ref="pt" />
+		</aop:aspect>
+		<!--配置的是事务的增强 -->
+	</aop:config>
+</beans>

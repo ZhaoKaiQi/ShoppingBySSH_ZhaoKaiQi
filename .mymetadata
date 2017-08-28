@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="ShoppingBySSH_ZhaoKaiQi"
+  id="myeclipse.1497727937709"
+  context-root="/ShoppingBySSH_ZhaoKaiQi"
+  j2ee-spec="5.0"
+  archive="ShoppingBySSH_ZhaoKaiQi.war">
+  <attributes>
+    <attribute name="webrootdir" value="WebRoot" />
+  </attributes>
+</project-module>
+

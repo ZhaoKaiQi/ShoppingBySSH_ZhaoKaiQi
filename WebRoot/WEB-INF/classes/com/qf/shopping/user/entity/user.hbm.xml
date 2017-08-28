@@ -1,0 +1,17 @@
+<?xml version='1.0'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+"-//Hibernate/Hibernate mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="com.qf.shopping.user.entity">
+	<class name="User" table="t_user">
+		<!-- 配置主键 -->
+		<id name="uId" column="uId">
+			<generator class="native"></generator>
+		</id>
+		<!-- 配置其他键 -->
+		<property name="uName" column="uName"></property>
+		<property name="uPassword" column="uPassword"></property>
+		<property name="uCode" column="uCode"></property>
+		<property name="uState" column="uState"></property>
+	</class>
+</hibernate-mapping>
